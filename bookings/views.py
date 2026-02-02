@@ -67,16 +67,16 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking = serializer.save(customer=user, provider=service.provider, service=service)
 
         # Send Telegram message to client and provider
-        from accounts.send_booking_message import send_booking_message
+        from accounts.send_booking_message import send_booking_message_sync
         # Client message
-        send_booking_message(
+        send_booking_message_sync(
             telegram_id=user.telegram_id,
             message=f"Your booking for {service.title} is created!",
             button_text="View Booking",
             button_url="https://balemuya-frontend-qn6y.vercel.app/bookings"
         )
         # Provider message
-        send_booking_message(
+        send_booking_message_sync(
             telegram_id=service.provider.telegram_id,
             message=f"New booking for your service: {service.title}",
             button_text="View Provider Dashboard",
@@ -217,14 +217,14 @@ class ProviderBookingViewSet(viewsets.ModelViewSet):
         booking.save()
 
         # Send Telegram message to client and provider on status change
-        from accounts.send_booking_message import send_booking_message
-        send_booking_message(
+        from accounts.send_booking_message import send_booking_message_sync
+        send_booking_message_sync(
             telegram_id=booking.customer.telegram_id,
             message=f"Your booking for {booking.service.title} status changed to {booking.status}!",
             button_text="View Booking",
             button_url="https://balemuya-frontend-qn6y.vercel.app/bookings"
         )
-        send_booking_message(
+        send_booking_message_sync(
             telegram_id=booking.provider.telegram_id,
             message=f"Booking for your service {booking.service.title} status changed to {booking.status}!",
             button_text="View Provider Dashboard",
