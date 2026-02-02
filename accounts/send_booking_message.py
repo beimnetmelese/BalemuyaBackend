@@ -1,13 +1,10 @@
 import os
-import requests
-from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
-from dotenv import load_dotenv
+import telebot
+
+API_TOKEN = os.getenv("BOT_API_KEY")
+bot = telebot.TeleBot(API_TOKEN)
 
 def send_booking_message(telegram_id, message, button_text, button_url):
-    load_dotenv()
-    API_TOKEN = os.getenv("BOT_API_KEY")
-    bot = Bot(token=API_TOKEN)
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(button_text, web_app=WebAppInfo(url=button_url))]
-    ])
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    keyboard.add(telebot.types.InlineKeyboardButton(text=button_text, url=button_url))
     bot.send_message(chat_id=telegram_id, text=message, reply_markup=keyboard)

@@ -44,6 +44,7 @@ pydantic==2.11.7
 pydantic_core==2.33.2
 PyJWT==2.10.1
 pyparsing==3.2.3
+pyTelegramBotAPI==4.30.0
 python-dotenv==1.2.1
 python-telegram-bot==20.7
 python3-openid==3.2.0

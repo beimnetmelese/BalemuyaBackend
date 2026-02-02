@@ -88,8 +88,14 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         base_qs = self.queryset
-        query = self.request.query_params.get('search', "").strip()
+        provider_telegram_id = self.request.query_params.get('provider_telegram_id')
+        if provider_telegram_id:
+            provider = User.objects.filter(telegram_id=provider_telegram_id).first()
+            if provider:
+                return base_qs.filter(provider=provider)
+            return Service.objects.none()
 
+        query = self.request.query_params.get('search', "").strip()
         if not query:
             return base_qs
 
@@ -136,7 +142,18 @@ class ServiceReviewViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         service_id = request.data.get('service')
-        reviewer_id = request.data.get('reviewer')
+        reviewer_telegram_id = (
+            request.query_params.get('reviewer_telegram_id')
+            or request.data.get('reviewer_telegram_id')
+        )
+        reviewer_id = None
+        if reviewer_telegram_id:
+            user = User.objects.filter(telegram_id=reviewer_telegram_id).first()
+            if user:
+                reviewer_id = user.id
+        if not reviewer_id:
+            reviewer_id = request.data.get('reviewer')
+
         if service_id and reviewer_id:
             existing = ServiceReview.objects.filter(service_id=service_id, reviewer_id=reviewer_id).first()
             if existing:
@@ -146,7 +163,11 @@ class ServiceReviewViewSet(viewsets.ModelViewSet):
                 serializer.is_valid(raise_exception=True)
                 self.perform_update(serializer)
                 return Response(serializer.data, status=200)
-        serializer = self.get_serializer(data=request.data)
+        # Inject reviewer if found
+        data = request.data.copy()
+        if reviewer_id:
+            data['reviewer'] = reviewer_id
+        serializer = self.get_serializer(data=data)
         if not serializer.is_valid():
             print("[ServiceReviewViewSet] Validation errors (create):", serializer.errors)
         serializer.is_valid(raise_exception=True)
