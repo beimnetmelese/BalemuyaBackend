@@ -216,7 +216,7 @@ class ProviderBookingViewSet(viewsets.ModelViewSet):
         booking.save()
 
         # Send Telegram message to client and provider on status change
-        from send_booking_message import send_booking_message
+        from accounts import send_booking_message
         send_booking_message(
             telegram_id=booking.customer.telegram_id,
             message=f"Your booking for {booking.service.title} status changed to {booking.status}!",
