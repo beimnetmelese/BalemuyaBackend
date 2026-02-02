@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from .models import User
-from .send_booking_message import send_booking_message
+from .send_booking_message import send_booking_message_sync
 from .serializers import UserSerializer
 from rest_framework.response import Response
 
@@ -24,7 +24,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=400)
         user = serializer.save()
         # Send Telegram message after registration
-        send_booking_message(
+        send_booking_message_sync(
             telegram_id=user.telegram_id,
             message="Registration successful! Welcome to Balemuya.",
             button_text="Go to Dashboard",
