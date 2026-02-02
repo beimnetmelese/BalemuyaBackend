@@ -10,17 +10,21 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'telegram_id'
 
     def create(self, request, *args, **kwargs):
+        telegram_id = request.data.get('telegram_id')
+        user = User.objects.filter(telegram_id=telegram_id).first()
+        if user:
+            # Update user with new info
+            serializer = self.get_serializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                user = serializer.save()
+                return Response(self.get_serializer(user).data, status=200)
+            else:
+                print("[User Update Error]", serializer.errors)
+                return Response(serializer.errors, status=400)
+        # If not exists, create new
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             print("[User Registration Error]", serializer.errors)
-            # If telegram_id already exists, treat as success and return the existing user
-            if 'telegram_id' in serializer.errors:
-                error_msgs = serializer.errors['telegram_id']
-                if any('already exists' in str(msg) for msg in error_msgs):
-                    telegram_id = request.data.get('telegram_id')
-                    user = User.objects.filter(telegram_id=telegram_id).first()
-                    if user:
-                        return Response(self.get_serializer(user).data, status=200)
             return Response(serializer.errors, status=400)
         user = serializer.save()
         # Send Telegram message after registration
