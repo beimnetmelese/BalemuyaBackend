@@ -78,7 +78,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
         service = serializer.save(provider=provider)
 
         # Send Telegram message to provider after successful service registration
-        from accounts import send_booking_message
+        from accounts.send_booking_message import send_booking_message
         send_booking_message(
             telegram_id=provider.telegram_id,
             message=f"Your service '{service.title}' has been registered successfully!",

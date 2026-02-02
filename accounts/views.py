@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from .models import User
-from accounts import send_booking_message
+from .send_booking_message import send_booking_message
 from .serializers import UserSerializer
 from rest_framework.response import Response
 
