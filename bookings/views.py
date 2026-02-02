@@ -66,7 +66,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking = serializer.save(customer=user, provider=service.provider, service=service)
 
         # Send Telegram message to client and provider
-        from send_booking_message import send_booking_message
+        from accounts import send_booking_message
         # Client message
         send_booking_message(
             telegram_id=user.telegram_id,
