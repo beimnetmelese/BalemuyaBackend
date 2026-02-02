@@ -51,6 +51,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         )
     
     def perform_create(self, serializer):
+        print(self.request.query_params.get('telegram_id'))
         telegram_id = self.request.query_params.get('telegram_id') or self.request.headers.get('telegram_id') or 123456
         if not telegram_id:
             return Response({"detail": "telegram_id is required"}, status=status.HTTP_400_BAD_REQUEST)
