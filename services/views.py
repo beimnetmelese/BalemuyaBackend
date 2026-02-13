@@ -83,11 +83,12 @@ class ServiceViewSet(viewsets.ModelViewSet):
             telegram_id=provider.telegram_id,
             message=f"Your service '{service.title}' has been registered successfully!",
             button_text="Go to Provider Dashboard",
-            button_url="https://balemuya-frontend-qn6y.vercel.app/provider-dashboard"
+            button_url="https://balemuya-frontend-qn6y.vercel.app/provider/dashboard"
         )
 
     def get_queryset(self):
-        base_qs = self.queryset
+        # Use a fresh queryset to avoid stale cached results on class-level QuerySet
+        base_qs = self.queryset.all()
         provider_telegram_id = self.request.query_params.get('provider_telegram_id')
         if provider_telegram_id:
             provider = User.objects.filter(telegram_id=provider_telegram_id).first()

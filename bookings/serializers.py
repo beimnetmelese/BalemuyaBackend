@@ -6,6 +6,7 @@ from accounts.serializers import UserSerializer  # or create a minimal user seri
 class BookingSerializer(serializers.ModelSerializer):
     # Nested serializers
     customer = UserSerializer(read_only=True)
+    provider = UserSerializer(read_only=True)
     service = ServiceSerializer(read_only=True)
     
     class Meta:

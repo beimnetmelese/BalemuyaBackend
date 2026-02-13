@@ -1,27 +1,25 @@
 import os
-import asyncio
-from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+import requests
 
-API_TOKEN = os.getenv("BOT_API_KEY")
-bot = Bot(token=API_TOKEN)
+BOT_SERVER_URL = os.getenv("BOT_SERVER_URL", "https://balemuyabot.onrender.com")
 
-async def send_booking_message(telegram_id, message, button_text, button_url):
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(button_text, web_app=WebAppInfo(url=button_url))]
-    ])
-    await bot.send_message(chat_id=telegram_id, text=message, reply_markup=keyboard)
 
-# telegram_helpers.py
-import asyncio
-from threading import Thread
-from .send_booking_message import send_booking_message
-
-def send_booking_message_sync(*args, **kwargs):
+def send_booking_message_sync(telegram_id, message, button_text, button_url):
     """
-    Runs the async send_booking_message in a background thread,
-    so you can call it like a normal synchronous function.
+    Send a booking message via the FastAPI bot service.
     """
-    def runner():
-        asyncio.run(send_booking_message(*args, **kwargs))
-    
-    Thread(target=runner).start()
+    payload = {
+        "telegram_id": str(telegram_id),
+        "message": message,
+        "button_text": button_text,
+        "button_url": button_url,
+    }
+    try:
+        requests.post(
+            f"{BOT_SERVER_URL}/telegram/send",
+            json=payload,
+            timeout=10,
+        )
+    except Exception:
+        # Best-effort fire-and-forget; avoid breaking booking flow.
+        pass
